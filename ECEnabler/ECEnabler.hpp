@@ -3,17 +3,18 @@
 
 #include <Headers/kern_patcher.hpp>
 
-#define AE_BAD_PARAMETER 0x1001
+static const char *pathAirportItlwm[] { "/System/Library/Extensions/AirportItlwm.kext/Contents/MacOS/AirPortItlwm" };
+static const char *pathAirPortBrcmNIC[]  { "/System/Library/Extensions/IO80211FamilyLegacy.kext/Contents/PlugIns/AirPortBrcmNIC.kext/Contents/MacOS/AirPortBrcmNIC" };
 
-static const char *kextACPIEC[] { "/System/Library/Extensions/AppleACPIPlatform.kext/Contents/PlugIns/AppleACPIEC.kext/Contents/MacOS/AppleACPIEC" };
 static KernelPatcher::KextInfo kextList[] {
-    {"com.apple.driver.AppleACPIEC", kextACPIEC, arrsize(kextACPIEC), {true}, {}, KernelPatcher::KextInfo::Unloaded },
+    { "com.zxystd.AirportItlwm", pathAirportItlwm, arrsize(pathAirportItlwm), {true}, {}, KernelPatcher::KextInfo::Unloaded },
+    { "com.apple.driver.AirPort.BrcmNIC", pathAirPortBrcmNIC, arrsize(pathAirPortBrcmNIC), {true}, {}, KernelPatcher::KextInfo::Unloaded }
 };
 
-static const char *oldEcSpaceHandlerSymbol { "__ZN11AppleACPIEC14ecSpaceHandlerEjyjPyPvS1_" }; // 10.7-10.12
-static const char *newEcSpaceHandlerSymbol { "__ZN11AppleACPIEC14ecSpaceHandlerEjmjPmPvS1_" }; // 10.13-???
+class IO80211Interface;
+class IO80211Controller;
 
-class ECE {
+class AirPortDebugPatcher {
 public:
     void init();
     void deinit();
@@ -21,9 +22,11 @@ public:
 private:
     void processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t addres, size_t size);
     
-    static IOReturn ecSpaceHandler(UInt32, UInt64, UInt32, UInt8 *, void*, void *);
-    
-    mach_vm_address_t orgACPIEC_ecSpaceHandler {0};
+    static SInt32 patched_apple80211Request(IO80211Controller* self,
+                                            unsigned int request_type,
+                                         int request_number,
+                                         IO80211Interface *interface,
+                                     void *data);
 };
 
 #endif //kern_ece_hpp

@@ -10,18 +10,18 @@
 
 #include "ECEnabler.hpp"
 
-static ECE ece;
+static AirPortDebugPatcher ece;
 
 const char *bootargOff[] {
-    "-eceoff"
+    "-airportdebugoff"
 };
 
 const char *bootargDebug[] {
-    "-ecedbg"
+    "-airportdebugdebug"
 };
 
 const char *bootargBeta[] {
-    "-ecebeta"
+    "-airportdebugbeta"
 };
 
 PluginConfiguration ADDPR(config) {
@@ -36,7 +36,7 @@ PluginConfiguration ADDPR(config) {
     arrsize(bootargDebug),
     bootargBeta,
     arrsize(bootargBeta),
-    KernelVersion::Lion,
+    KernelVersion::Ventura,
     KernelVersion::Ventura,
     []() {
         ece.init();

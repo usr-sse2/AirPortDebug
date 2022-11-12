@@ -25,7 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A42F74C12637AC33003E5AB9 /* ECEnabler.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ECEnabler.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		A42F74C12637AC33003E5AB9 /* AirPortDebug.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AirPortDebug.kext; sourceTree = BUILT_PRODUCTS_DIR; };
 		A42F74C42637AC33003E5AB9 /* ECEnabler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ECEnabler.hpp; sourceTree = "<group>"; };
 		A42F74C62637AC33003E5AB9 /* ECEnabler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ECEnabler.cpp; sourceTree = "<group>"; };
 		A42F74C82637AC33003E5AB9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -70,7 +70,7 @@
 		A42F74C22637AC33003E5AB9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A42F74C12637AC33003E5AB9 /* ECEnabler.kext */,
+				A42F74C12637AC33003E5AB9 /* AirPortDebug.kext */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -145,9 +145,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		A42F74C02637AC33003E5AB9 /* ECEnabler */ = {
+		A42F74C02637AC33003E5AB9 /* AirPortDebug */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A42F74CB2637AC33003E5AB9 /* Build configuration list for PBXNativeTarget "ECEnabler" */;
+			buildConfigurationList = A42F74CB2637AC33003E5AB9 /* Build configuration list for PBXNativeTarget "AirPortDebug" */;
 			buildPhases = (
 				A42F74BC2637AC33003E5AB9 /* Headers */,
 				A42F74BD2637AC33003E5AB9 /* Sources */,
@@ -158,9 +158,9 @@
 			);
 			dependencies = (
 			);
-			name = ECEnabler;
+			name = AirPortDebug;
 			productName = ECEnabler;
-			productReference = A42F74C12637AC33003E5AB9 /* ECEnabler.kext */;
+			productReference = A42F74C12637AC33003E5AB9 /* AirPortDebug.kext */;
 			productType = "com.apple.product-type.kernel-extension";
 		};
 /* End PBXNativeTarget section */
@@ -189,7 +189,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A42F74C02637AC33003E5AB9 /* ECEnabler */,
+				A42F74C02637AC33003E5AB9 /* AirPortDebug */,
 			);
 		};
 /* End PBXProject section */
@@ -358,8 +358,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1.0.0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"__IO80211_TARGET=__MAC_13_0",
+					"PRODUCT_NAME=AirPortDebug",
+				);
 				INFOPLIST_FILE = ECEnabler/Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MODULE_NAME = com.1Revenger1.ECEnabler;
 				MODULE_START = "$(PRODUCT_NAME)_kern_start";
 				MODULE_STOP = "$(PRODUCT_NAME)_kern_stop";
@@ -379,9 +383,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1.0.0;
-				GCC_PREPROCESSOR_DEFINITIONS = "PRODUCT_NAME=$(PRODUCT_NAME)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"__IO80211_TARGET=__MAC_13_0",
+					"PRODUCT_NAME=AirPortDebug",
+				);
 				INFOPLIST_FILE = ECEnabler/Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MODULE_NAME = com.1Revenger1.ECEnabler;
 				MODULE_START = "$(PRODUCT_NAME)_kern_start";
 				MODULE_STOP = "$(PRODUCT_NAME)_kern_stop";
@@ -406,7 +413,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A42F74CB2637AC33003E5AB9 /* Build configuration list for PBXNativeTarget "ECEnabler" */ = {
+		A42F74CB2637AC33003E5AB9 /* Build configuration list for PBXNativeTarget "AirPortDebug" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A42F74CC2637AC33003E5AB9 /* Debug */,

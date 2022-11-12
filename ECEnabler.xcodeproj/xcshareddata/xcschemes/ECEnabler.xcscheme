@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A42F74C02637AC33003E5AB9"
-               BuildableName = "ECEnabler.kext"
-               BlueprintName = "ECEnabler"
+               BuildableName = "AirPortDebug.kext"
+               BlueprintName = "AirPortDebug"
                ReferencedContainer = "container:ECEnabler.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -51,8 +51,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A42F74C02637AC33003E5AB9"
-            BuildableName = "ECEnabler.kext"
-            BlueprintName = "ECEnabler"
+            BuildableName = "AirPortDebug.kext"
+            BlueprintName = "AirPortDebug"
             ReferencedContainer = "container:ECEnabler.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
