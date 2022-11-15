@@ -23,6 +23,7 @@ void AirPortDebugPatcher::deinit()
 {
 }
 
+static mach_vm_address_t orig_postMessage {};
 static mach_vm_address_t orig_apple80211Request {};
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -298,6 +299,30 @@ static const char* IOCTL_NAMES[] = {
      "PER_CORE_RSSI_REPORT/SUPPRESS_SCANS",
 };
 
+static char* bytesToStr(uint8_t *bytes, size_t len) {
+    char* s = (char*)IOMalloc(len * 3 + 1);
+    char* p = s;
+    for (size_t i = 0; i < len; i++) {
+        sprintf(p, "%02x ", bytes[i]);
+        p += 3;
+    }
+    *p = 0;
+    return s;
+}
+
+static char* ether_sprintf(const uint8_t *ap) {
+     static char etherbuf[18];
+     snprintf(etherbuf, sizeof (etherbuf), "%6D", ap, ":");
+     return (etherbuf);
+}
+
+void AirPortDebugPatcher::postMessage(IO80211Interface *interface, unsigned int message, void* data, unsigned long dataLen) {
+    char* dataStr = bytesToStr((uint8_t*)data, (size_t)dataLen);
+    SYSLOG(MODULE_SHORT, "Posting message %d with data (length %d) %s", message, dataLen, dataStr);
+    IOFree(dataStr, dataLen * 3 + 1);
+    FunctionCast(postMessage, orig_postMessage)(interface, message, data, dataLen);
+}
+
 SInt32 AirPortDebugPatcher::patched_apple80211Request(IO80211Controller* controller,
                                                       unsigned int request_type,
                                      int request_number,
@@ -306,6 +331,50 @@ SInt32 AirPortDebugPatcher::patched_apple80211Request(IO80211Controller* control
     
     SInt32 ret = FunctionCast(patched_apple80211Request, orig_apple80211Request)(controller, request_type, request_number, interface, data);
     SYSLOG(MODULE_SHORT, "%s %d (%s) returned %d", request_type == SIOCSA80211 ? "SET" : (request_type == SIOCGA80211 ? "GET" : "UNKNOWN"), request_number, IOCTL_NAMES[request_number >= ARRAY_SIZE(IOCTL_NAMES) ? 0: request_number], ret);
+    switch (request_number) {
+        case APPLE80211_IOC_SCAN_REQ:
+        {
+            struct apple80211_scan_data *sd = (struct apple80211_scan_data*)data;
+            SYSLOG(MODULE_SHORT, "%s Type: %u BSS Type: %u PHY Mode: %u Dwell time: %u Rest time: %u Num channels: %u SSID: %s BSSID: %s",
+                   __FUNCTION__,
+                   sd->scan_type,
+                   sd->bss_type,
+                   sd->phy_mode,
+                   sd->dwell_time,
+                   sd->rest_time,
+                   sd->num_channels,
+                   sd->ssid,
+                   ether_sprintf(sd->bssid.octet));
+            break;
+        }
+            
+        case APPLE80211_IOC_SCAN_REQ_MULTIPLE:
+        {
+            struct apple80211_scan_multiple_data *sd = (struct apple80211_scan_multiple_data*)data;
+            int i;
+            SYSLOG(MODULE_SHORT, "%s Type: %u SSID Count: %u BSSID Count: %u PHY Mode: %u Dwell time: %u Rest time: %u Num channels: %u Unk: %u",
+                  __FUNCTION__,
+                  sd->scan_type,
+                  sd->ssid_count,
+                  sd->bssid_count,
+                  sd->phy_mode,
+                  sd->dwell_time,
+                  sd->rest_time,
+                  sd->num_channels,
+                  sd->unk_2);
+            for (i = 0; i < sd->ssid_count; i++) {
+                SYSLOG(MODULE_SHORT, "%s index=%d ssid=%s ssid_len=%d", __FUNCTION__, i, sd->ssids[i].ssid_bytes, sd->ssids[i].ssid_len);
+            }
+            break;
+        }
+            
+        case APPLE80211_IOC_SCAN_RESULT:
+        {
+            struct apple80211_scan_result *result = *((struct apple80211_scan_result**)data);
+            SYSLOG(MODULE_SHORT, "%s bssid=%s ssid=%s channel=%d cap=%x ssid_len=%d ie_len=%d rssi=%d noise=%d", __FUNCTION__, ether_sprintf(result->asr_bssid), result->asr_ssid, result->asr_channel.channel, result->asr_cap, result->asr_ssid_len, result->asr_ie_len, result->asr_rssi, result->asr_noise);
+            break;
+        }
+    }
     return ret;
 }
 
@@ -325,5 +394,12 @@ void AirPortDebugPatcher::processKext(KernelPatcher &patcher, size_t index, mach
             SYSLOG(MODULE_SHORT, "routed __ZN15AirPort_BrcmNIC17apple80211RequestEjiP16IO80211InterfacePv");
         else
             SYSLOG(MODULE_SHORT, "Failed to route __ZN15AirPort_BrcmNIC17apple80211RequestEjiP16IO80211InterfacePv");
+    }
+    else if (kextList[2].loadIndex == index) {
+        KernelPatcher::RouteRequest postMessageRequestRoute = KernelPatcher::RouteRequest("__ZN16IO80211Interface11postMessageEjPvm", postMessage, orig_postMessage);
+        if (patcher.routeMultiple(index, &postMessageRequestRoute, 1, address, size))
+            SYSLOG(MODULE_SHORT, "routed __ZN16IO80211Interface11postMessageEjPvm");
+        else
+            SYSLOG(MODULE_SHORT, "Failed to route __ZN16IO80211Interface11postMessageEjPvm");
     }
 }
