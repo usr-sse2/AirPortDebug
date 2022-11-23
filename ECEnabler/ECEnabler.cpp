@@ -354,7 +354,7 @@ static void printScanReqMultiple(struct apple80211_scan_multiple_data *sd) {
 }
 
 static void printScanResult(struct apple80211_scan_result *result) {
-    SYSLOG(MODULE_SHORT, "%s bssid=%s ssid=%s channel=%d cap=%x ssid_len=%d ie_len=%d rssi=%d noise=%d", __FUNCTION__, ether_sprintf(result->asr_bssid), result->asr_ssid, result->asr_channel.channel, result->asr_cap, result->asr_ssid_len, result->asr_ie_len, result->asr_rssi, result->asr_noise);
+    SYSLOG(MODULE_SHORT, "%s version=%d channel=(%d,%d,%d) unk=%d noise=%d snr=%d rssi=%d beacon_int=%d cap=%d bssid=%s nrates=%d nr_unk=%d ssid_len=%d ssid=%s unk=%d unk2=%d age=%d unk3=%d ie_len=%d unk3=%d", __FUNCTION__, result->version, result->asr_channel.version, result->asr_channel.channel, result->asr_channel.flags, result->asr_unk, result->asr_noise, result->asr_snr, result->asr_rssi, result->asr_beacon_int, result->asr_cap, ether_sprintf(result->asr_bssid), result->asr_nrates, result->asr_nr_unk, result->asr_ssid_len, result->asr_ssid, result->unk, result->unk2, result->asr_age, result->unk3, result->asr_ie_len, result->asr_unk3);
 }
 
 SInt32 AirPortDebugPatcher::patched_apple80211Request(IO80211Controller* controller,
